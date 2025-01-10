@@ -1,4 +1,5 @@
 import discord
+import speech_recognition as speech_recog
 from discord.ext import commands
 import requests
 import os
@@ -8,7 +9,20 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix='S/', intents=intents)
-
+def speech_es():
+    mic = speech_recog.Microphone()
+    recog = speech_recog.Recognizer()
+    with mic as audio_file:
+        recog.adjust_for_ambient_noise(audio_file)
+        audio = recog.listen(audio_file)
+        return recog.recognize_google(audio, language="es-ES")
+@bot.command()
+async def recognize(ctx):
+    try:
+        result = speech_es()
+        await ctx.send(f'Recognized speech: {result}')
+    except Exception as e:
+        await ctx.send(f'Error: {e}')
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
